@@ -1,0 +1,14 @@
+language: c
+install:
+- sudo apt-get install gradle
+script: ./configure --prefix="$PWD/root" && make
+after_success: make zip dist_name=${TRAVIS_TAG}
+deploy:
+  provider: releases
+  api_key:
+    secure: lfhBh/mAtAgLssej5iBgau60eKTotpC7bz4WT2gQpD41PngRWtZHfwgdvKlXq6BMnSSeXtuuJL8YYWTr3NffaGSb0CbOMBpyA/UlwujiQXhNgeQpWUd8hWGF/BosFc/VHpFV+Xob6y/kqT4LlnsCLXonrCiY8XTfrIfTVKduvdGxmwbnvVVOSUgSkMx7XKYLFI+KWQTjGwi3O6ZGDbK1ihoc/xGXdzK1wJK2polh9d91gR67KIfYMOmDz+vikPNDQDxpG1hz7TpG1Iq5Z9XeD4hwG4TNpADKea7Z0qAZdw8KhVv+Iq6WFGhFD0qH4phklyJKGLd01YBO6Y+GcZwOGo4zBkv3hAFAaAImNAxqSUCYlc3CcXC1TXUJL3ntCR4mKT81ec/SkWJOwTJLXOk2PAluJ6sY1pzNqg+JmvvQp1U0ITQTYGVYSD2EuNhPk5p1xuiZjEcAu4bKjV746Y6Wdh51Xw5i8k4fA6xCc5Gdl32ic/++HC688Ni8omtdAW5bSZQsipVG/O6t1j6RXNAHhsAvvrjYflJu9np2jabtnWj6/Lqy5QhDDpqSYfuCRnmVxh9PWeQJIg2SgGEHXy/iH0GKFBxoawxMpBFDzfB0X/hAToUR1t1+OCD4FxwUR2ExfR9j9FIuOqgRh8A4WfTeT5fNvrVNtobRBTcNZu9xd/A=
+  file: tmp/${TRAVIS_TAG}.zip
+  on:
+    repo: webb/jing-cli
+    all_branches: true
+    tags: true
