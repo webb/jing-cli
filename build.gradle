@@ -1,0 +1,14 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    runtime 'com.thaiopensource:jing:20091111'
+}
+
+task out(type:Copy) {
+     from configurations.runtime
+     into 'tmp/gradle-out'
+}

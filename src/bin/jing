@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+# Copyright 2015 Georgia Tech Research Corporation (GTRC). All rights reserved.
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
+set -o nounset -o errexit
+
+root_dir=$(dirname "$0")/..
+. "$root_dir"/share/MACRO_WRTOOLS_CORE_PACKAGE_NAME/opt_help.bash
+. "$root_dir"/share/MACRO_WRTOOLS_CORE_PACKAGE_NAME/opt_verbose.bash
+. "$root_dir"/share/MACRO_WRTOOLS_CORE_PACKAGE_NAME/fail.bash
+. "$root_dir"/share/MACRO_WRTOOLS_CORE_PACKAGE_NAME/temp.bash
+
+package_share_dir="$root_dir"/share/MACRO_PACKAGE_NAME
+
+#HELP:COMMAND_NAME: Run the Jing RelaxNG validator
+#HELP:Usage:
+#HELP:  COMMAND_NAME [Options] -- jing-args ...
+
+#HELP:Options:
+#HELP:  --help | -h: Print this help
+#HELP:    see additional help at http://www.thaiopensource.com/relaxng/jing.html
+#HELP:  --verbose, -v: Print additional diagnostics
+
+jars=("$package_share_dir"/*.jar)
+(( ${#jars[@]} > 0 )) || fail "No jars found in $package_share_dir"
+classpath=$(tokenize-strings -o : "${jars[@]}")
+base_command=(java -classpath "$classpath" com.thaiopensource.relaxng.util.Driver)
+
+opt_help2 () {
+    print_help
+    "${base_command[@]}"
+}
+
+OPTIND=1
+while getopts :hi:o:vx:-: option
+do case "$option" in
+       h ) opt_help2;;
+       v ) opt_verbose;;
+       - ) case "$OPTARG" in
+               help ) opt_help2;;
+               verbose ) opt_verbose;;
+               help=* | verbose=* ) fail "Long option \"${OPTARG%%=*}\" has unexpected argument";;
+               * ) fail "Unknown long option \"${OPTARG%%=*}\"";;
+            esac;;
+        '?' ) fail "Unknown short option \"$OPTARG\"";;
+        : ) fail "Short option \"$OPTARG\" missing argument";;
+        * ) fail "Bad state in getopts (OPTARG=\"$OPTARG\")";;
+   esac
+done
+shift $((OPTIND-1))
+
+vrun "${base_command[@]}" "$@"
